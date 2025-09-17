@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Web application
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/content_factory
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=http://supabase:8000
+      - SUPABASE_KEY=your-supabase-key
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  # Database (PostgreSQL)
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=content_factory
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Redis for Celery
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+  # Celery worker
+  worker:
+    build: .
+    command: celery -A celery_worker.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/content_factory
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=http://supabase:8000
+      - SUPABASE_KEY=your-supabase-key
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  # Celery beat scheduler
+  beat:
+    build: .
+    command: celery -A celery_worker.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/content_factory
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=http://supabase:8000
+      - SUPABASE_KEY=your-supabase-key
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  # Supabase (as a replacement for PostgreSQL)
+  supabase:
+    image: supabase/postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=content_factory
+    ports:
+      - "5433:5432"
+    volumes:
+      - supabase_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  supabase_data:
