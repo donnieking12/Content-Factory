@@ -69,10 +69,14 @@ content-factory-ai/
 ├── Makefile
 ├── .env.example
 ├── .gitignore
+├── .dockerignore
+├── SETUP.md
 └── README.md
 ```
 
 ## Getting Started
+
+For detailed setup instructions, please refer to [SETUP.md](SETUP.md).
 
 ### Prerequisites
 
@@ -80,7 +84,7 @@ content-factory-ai/
 - Docker and Docker Compose (recommended)
 - FFmpeg
 
-### Installation
+### Quick Start
 
 1. Clone the repository:
    ```bash

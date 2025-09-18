@@ -7,8 +7,12 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Create Supabase database engine
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+# Create database engine
+# Use SQLite for testing when DATABASE_URL is not set
+if settings.DATABASE_URL:
+    engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+else:
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
 
 # Create a SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

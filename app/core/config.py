@@ -4,7 +4,8 @@ Configuration settings for the AI Content Factory application
 import os
 from typing import List, Optional
 
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic_settings import BaseSettings
+from pydantic import AnyHttpUrl
 
 
 class Settings(BaseSettings):
