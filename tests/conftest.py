@@ -20,6 +20,10 @@ def test_db():
         poolclass=StaticPool,
     )
     
+    # Create all tables in the correct order to handle foreign keys
+    # Import all models to ensure they are registered with Base
+    from app.models import product, video
+    
     # Create all tables
     Base.metadata.create_all(bind=engine)
     

@@ -2,6 +2,17 @@
 
 An automated system that discovers trending products, clones viral video formats, generates new video scripts using AI, creates videos using an AI avatar service, and publishes them to multiple social media platforms.
 
+## Current Status
+
+✅ **Initial Setup Complete**
+- Core application structure is in place
+- Database configuration updated with Supabase connection
+- All tests are passing
+- Application is running successfully
+
+⏳ **Next Steps**
+For detailed next steps, please refer to [NEXT_STEPS.md](NEXT_STEPS.md).
+
 ## Core Tech Stack
 
 - Language: Python 3.10+
@@ -71,6 +82,7 @@ content-factory-ai/
 ├── .gitignore
 ├── .dockerignore
 ├── SETUP.md
+├── NEXT_STEPS.md
 └── README.md
 ```
 

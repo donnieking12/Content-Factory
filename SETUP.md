@@ -95,12 +95,21 @@ Edit the `.env` file with your actual credentials:
 
 ### 5. Database Setup
 
-The application uses Supabase as the database. You'll need to:
+The application uses Supabase as the database. You've already provided your connection string, which has been configured in the application.
 
-1. Create a Supabase account: https://supabase.io/
-2. Create a new project
-3. Get your project URL and API key
-4. Update the `.env` file with these credentials
+To set up the database tables:
+
+1. Make sure your Supabase key is set in the `.env` file:
+   ```
+   SUPABASE_KEY=your_actual_supabase_key_here
+   ```
+
+2. Run the database setup script:
+   ```bash
+   python setup_db.py
+   ```
+
+3. Verify that the tables were created in your Supabase dashboard.
 
 ### 6. Redis Setup
 
@@ -231,8 +240,10 @@ Once the application is running, you can access:
 
 ## Next Steps
 
+For detailed next steps on implementing the business logic and deploying the application, please refer to [NEXT_STEPS.md](NEXT_STEPS.md).
+
 1. Implement the actual business logic in the service modules
-2. Add your social media API credentials
+2. Add your social media API credentials to `.env`
 3. Set up your AI avatar service
 4. Customize the product discovery logic
 5. Implement video generation algorithms

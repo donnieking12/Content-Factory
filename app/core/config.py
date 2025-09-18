@@ -18,27 +18,41 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
+    # Security settings
+    SECRET_KEY: str = ""
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     # Database settings (Supabase)
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
 
     # Redis settings for Celery
-    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_URL: str = "redis://localhost:6379/0"
 
     # Social media API keys (to be set in environment variables)
-    TIKTOK_CLIENT_KEY: str = os.getenv("TIKTOK_CLIENT_KEY", "")
-    TIKTOK_CLIENT_SECRET: str = os.getenv("TIKTOK_CLIENT_SECRET", "")
-    INSTAGRAM_CLIENT_ID: str = os.getenv("INSTAGRAM_CLIENT_ID", "")
-    INSTAGRAM_CLIENT_SECRET: str = os.getenv("INSTAGRAM_CLIENT_SECRET", "")
-    YOUTUBE_API_KEY: str = os.getenv("YOUTUBE_API_KEY", "")
+    TIKTOK_CLIENT_KEY: str = ""
+    TIKTOK_CLIENT_SECRET: str = ""
+    INSTAGRAM_CLIENT_ID: str = ""
+    INSTAGRAM_CLIENT_SECRET: str = ""
+    YOUTUBE_API_KEY: str = ""
 
     # AI Avatar service settings
-    AI_AVATAR_API_URL: str = os.getenv("AI_AVATAR_API_URL", "")
-    AI_AVATAR_API_KEY: str = os.getenv("AI_AVATAR_API_KEY", "")
+    AI_AVATAR_API_URL: str = ""
+    AI_AVATAR_API_KEY: str = ""
 
     # FFmpeg path
-    FFMPEG_PATH: str = os.getenv("FFMPEG_PATH", "ffmpeg")
+    FFMPEG_PATH: str = "ffmpeg"
+
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construct DATABASE_URL from Supabase credentials"""
+        if self.SUPABASE_URL and self.SUPABASE_KEY:
+            # Extract the host from SUPABASE_URL
+            # Supabase URL format: https://<project-id>.supabase.co
+            # PostgreSQL connection format: postgresql://postgres:[YOUR-PASSWORD]@db.<project-id>.supabase.co:5432/postgres
+            host = self.SUPABASE_URL.replace("https://", "")
+            return f"postgresql://postgres:{self.SUPABASE_KEY}@db.{host}:5432/postgres"
+        return ""
 
     class Config:
         case_sensitive = True
