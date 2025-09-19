@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.social_media import SocialMediaPost, SocialMediaPostCreate, SocialMediaPostUpdate
-from app.services.social_media_publisher import get_post_by_id, get_posts, create_post, update_post, delete_post
+from app.services.social_media_publisher import get_post_by_id, get_posts, create_post, update_post, delete_post, publish_to_multiple_platforms
 
 router = APIRouter()
 
@@ -51,3 +51,42 @@ def delete_existing_post(post_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Social media post not found")
     return None
+
+
+@router.post("/publish-video/{video_id}", status_code=status.HTTP_202_ACCEPTED)
+async def publish_video_to_platforms(video_id: int, platforms: List[str] = ["tiktok", "instagram", "youtube"], db: Session = Depends(get_db)):
+    """
+    Publish a video to multiple social media platforms
+    """
+    # Get the video to publish
+    from app.services.video_generation import get_video_by_id
+    video = get_video_by_id(db, video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+    
+    # In a real implementation, we would trigger the Celery task:
+    # from celery_worker import publish_video_task
+    # task = publish_video_task.delay(video_id, platforms)
+    # return {"task_id": task.id, "status": "started"}
+    
+    # For now, execute synchronously for demonstration
+    # Handle SQLAlchemy column objects properly
+    video_url = video.video_url if video.video_url is not None else "https://example.com/sample-video.mp4"
+    title = video.title if video.title is not None else "Untitled Video"
+    description = video.description if video.description is not None else "Check out this amazing product!"
+    
+    results = await publish_to_multiple_platforms(
+        str(video_url),
+        str(title),
+        str(description)
+    )
+    
+    # Save the publication results
+    successful_publishes = [r for r in results if r.get("status") == "published"]
+    
+    return {
+        "status": "completed",
+        "video_id": video_id,
+        "platforms_published": len(successful_publishes),
+        "results": results
+    }

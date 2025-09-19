@@ -35,3 +35,4 @@ supabase>=0.0.5
 
 # Utilities
 python-dateutil>=2.8.0
+psutil>=5.8.0

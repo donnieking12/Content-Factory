@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.product import Product, ProductCreate, ProductUpdate
-from app.services.product_discovery import get_product_by_id, get_products, create_product, update_product, delete_product
+from app.services.product_discovery import get_product_by_id, get_products, create_product, update_product, delete_product, discover_trending_products
 
 router = APIRouter()
 
@@ -51,3 +51,22 @@ def delete_existing_product(product_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Product not found")
     return None
+
+
+@router.post("/discover-trending", status_code=status.HTTP_202_ACCEPTED)
+def discover_trending_products_endpoint(db: Session = Depends(get_db)):
+    """
+    Discover trending products from external sources
+    """
+    # In a real implementation, we would trigger the Celery task:
+    # from celery_worker import discover_products_task
+    # task = discover_products_task.delay()
+    # return {"task_id": task.id, "status": "started"}
+    
+    # For now, execute synchronously for demonstration
+    discovered_products = discover_trending_products(db)
+    return {
+        "status": "completed",
+        "products_discovered": len(discovered_products),
+        "products": discovered_products
+    }

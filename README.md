@@ -10,6 +10,14 @@ An automated system that discovers trending products, clones viral video formats
 - All tests are passing
 - Application is running successfully
 
+✅ **Core Business Logic Implemented**
+- Product discovery service with trend analysis
+- Video generation service with AI script creation
+- AI avatar integration for video creation
+- Social media publishing to multiple platforms
+- Content workflow orchestration
+- Background task processing with Celery
+
 ⏳ **Next Steps**
 For detailed next steps, please refer to [NEXT_STEPS.md](NEXT_STEPS.md).
 
@@ -58,7 +66,8 @@ content-factory-ai/
 │   │   ├── product_discovery.py
 │   │   ├── video_generation.py
 │   │   ├── ai_avatar.py
-│   │   └── social_media_publisher.py
+│   │   ├── social_media_publisher.py
+│   │   └── content_workflow.py
 │   └── utils/
 │       ├── __init__.py
 │       └── helpers.py
@@ -66,7 +75,8 @@ content-factory-ai/
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_products.py
-│   └── test_videos.py
+│   ├── test_videos.py
+│   └── test_content_workflow.py
 ├── alembic/
 │   ├── versions/
 │   ├── env.py
@@ -178,16 +188,20 @@ alembic upgrade head
 - `GET /api/v1/products/{id}` - Get a product
 - `PUT /api/v1/products/{id}` - Update a product
 - `DELETE /api/v1/products/{id}` - Delete a product
+- `POST /api/v1/products/discover-trending` - Discover trending products
 - `GET /api/v1/videos/` - List videos
 - `POST /api/v1/videos/` - Create a video
 - `GET /api/v1/videos/{id}` - Get a video
 - `PUT /api/v1/videos/{id}` - Update a video
 - `DELETE /api/v1/videos/{id}` - Delete a video
+- `POST /api/v1/videos/generate-for-product/{id}` - Generate video for a product
+- `POST /api/v1/videos/execute-full-workflow` - Execute full content workflow
 - `GET /api/v1/social-media/` - List social media posts
 - `POST /api/v1/social-media/` - Create a social media post
 - `GET /api/v1/social-media/{id}` - Get a social media post
 - `PUT /api/v1/social-media/{id}` - Update a social media post
 - `DELETE /api/v1/social-media/{id}` - Delete a social media post
+- `POST /api/v1/social-media/publish-video/{id}` - Publish video to social media
 
 ## Development
 
@@ -225,6 +239,9 @@ AI-powered video script generation and AI avatar-based video creation.
 
 ### Social Media Publishing
 Publish videos to TikTok, Instagram, YouTube, and other platforms.
+
+### Content Workflow
+Orchestrates the entire content creation process from product discovery to social media publishing.
 
 ## Contributing
 

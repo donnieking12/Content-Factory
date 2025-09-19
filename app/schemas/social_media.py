@@ -11,8 +11,10 @@ class SocialMediaPostBase(BaseModel):
     platform: str
     post_id: Optional[str] = None
     video_id: Optional[int] = None
+    content: Optional[str] = None
     status: str = "pending"
     post_url: Optional[str] = None
+    scheduled_time: Optional[datetime] = None
 
 
 class SocialMediaPostCreate(SocialMediaPostBase):
@@ -23,8 +25,10 @@ class SocialMediaPostUpdate(BaseModel):
     platform: Optional[str] = None
     post_id: Optional[str] = None
     video_id: Optional[int] = None
+    content: Optional[str] = None
     status: Optional[str] = None
     post_url: Optional[str] = None
+    scheduled_time: Optional[datetime] = None
 
 
 class SocialMediaPostInDBBase(SocialMediaPostBase):

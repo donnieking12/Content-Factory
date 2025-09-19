@@ -34,7 +34,14 @@ class Settings(BaseSettings):
     TIKTOK_CLIENT_SECRET: str = ""
     INSTAGRAM_CLIENT_ID: str = ""
     INSTAGRAM_CLIENT_SECRET: str = ""
+    INSTAGRAM_PAGE_ID: str = ""
     YOUTUBE_API_KEY: str = ""
+
+    # E-commerce API keys
+    ECOMMERCE_API_KEY: str = ""
+
+    # AI Service API keys
+    OPENAI_API_KEY: str = ""
 
     # AI Avatar service settings
     AI_AVATAR_API_URL: str = ""
@@ -42,6 +49,9 @@ class Settings(BaseSettings):
 
     # FFmpeg path
     FFMPEG_PATH: str = "ffmpeg"
+
+    # Environment
+    ENVIRONMENT: str = "development"
 
     @property
     def DATABASE_URL(self) -> str:
