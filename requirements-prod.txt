@@ -1,0 +1,20 @@
+# Production requirements extending base requirements
+-r requirements.txt
+
+# Production server
+gunicorn>=21.2.0
+
+# Monitoring and logging
+sentry-sdk[fastapi]>=1.32.0
+prometheus-client>=0.17.0
+structlog>=23.1.0
+
+# Security
+python-jose[cryptography]>=3.3.0
+
+# Performance
+uvloop>=0.17.0
+httptools>=0.6.0
+
+# Health checks
+psutil>=5.8.0

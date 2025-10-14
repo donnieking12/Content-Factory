@@ -75,13 +75,17 @@ def generate_video_script(product_id: int, db: Session) -> str:
     Keep it concise and engaging for social media. Format it with scene descriptions in brackets.
     """
     
-    # In a real implementation, this would call an AI service to generate a script
-    # For now in development, we'll use a template-based approach
-    # In production, uncomment the line below to use the real AI service:
-    # import asyncio
-    # return asyncio.run(call_ai_script_generation_api(prompt))
+    # Try to use real AI service if API key is configured
+    from app.core.config import settings
+    if settings.OPENAI_API_KEY and settings.OPENAI_API_KEY != "your_openai_api_key_here":
+        try:
+            import asyncio
+            return asyncio.run(call_ai_script_generation_api(prompt))
+        except Exception as e:
+            print(f"AI API failed, falling back to template: {e}")
+            # Fall back to template if API fails
     
-    # Template-based script for development
+    # Template-based script for development or fallback
     script_template = f"""
     [Opening Scene]
     Hey everyone! Today I'm excited to show you {product.name}.

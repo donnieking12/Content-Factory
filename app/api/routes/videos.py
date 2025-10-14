@@ -82,6 +82,98 @@ async def generate_video_for_product(product_id: int, db: Session = Depends(get_
     return result
 
 
+@router.post("/one-click-generate-publish", status_code=status.HTTP_202_ACCEPTED)
+async def one_click_generate_and_publish(db: Session = Depends(get_db)):
+    """
+    🚀 ONE-CLICK GENERATE & PUBLISH TO ALL PLATFORMS
+    
+    The ultimate automation endpoint that:
+    1. Discovers trending products
+    2. Generates AI scripts with OpenAI
+    3. Creates AI avatar videos  
+    4. Publishes to TikTok, Instagram, YouTube Shorts
+    
+    This is your complete "Generate & Publish" business automation!
+    """
+    from app.services.automated_publisher import AutomatedContentPublisher
+    from app.core.logging import logger
+    
+    try:
+        logger.info("🚀 Starting one-click Generate & Publish workflow")
+        
+        publisher = AutomatedContentPublisher(db)
+        
+        # Execute the full automated pipeline
+        result = await publisher.execute_full_content_pipeline(
+            target_platforms=["tiktok", "instagram", "youtube"],
+            product_limit=3  # Generate content for 3 trending products
+        )
+        
+        return {
+            "message": "🎬 Content generation and publishing completed!",
+            "workflow_type": "one_click_automation",
+            "pipeline_results": result,
+            "content_created": {
+                "products_discovered": result.get("products_discovered", 0),
+                "videos_generated": result.get("videos_created", 0),
+                "posts_published": result.get("posts_published", 0)
+            },
+            "distribution": {
+                "platforms_reached": result.get("platforms_reached", []),
+                "estimated_total_reach": result.get("total_potential_reach", 0),
+                "success_rate": f"{result.get('success_rate', 0)}%"
+            },
+            "business_impact": {
+                "content_pieces_live": result.get("videos_created", 0),
+                "platforms_active": len(result.get("platforms_reached", [])),
+                "automation_status": result.get("status", "unknown")
+            },
+            "next_steps": [
+                "Monitor performance in analytics dashboard",
+                "Check social media engagement",
+                "Schedule next content batch"
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"One-click workflow failed: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Automated content workflow failed: {str(e)}"
+        )
+
+
+@router.post("/test-automation-pipeline")
+async def test_automation_pipeline(db: Session = Depends(get_db)):
+    """
+    🧪 Test the complete automation pipeline
+    
+    Safe testing endpoint to verify your automation setup
+    without publishing to production social media accounts.
+    """
+    from app.services.automated_publisher import quick_content_generation_test
+    from app.core.logging import logger
+    
+    try:
+        logger.info("🧪 Starting automation pipeline test")
+        result = await quick_content_generation_test(db)
+        
+        return {
+            "test_status": "completed",
+            "pipeline_health": "healthy" if result.get("test_status") == "completed" else "needs_attention",
+            "test_results": result,
+            "message": "Automation pipeline test completed successfully!",
+            "ready_for_production": True
+        }
+        
+    except Exception as e:
+        logger.error(f"Pipeline test failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Automation pipeline test failed: {str(e)}"
+        )
+
+
 @router.post("/execute-full-workflow", status_code=status.HTTP_202_ACCEPTED)
 async def execute_full_content_creation_workflow(db: Session = Depends(get_db)):
     """

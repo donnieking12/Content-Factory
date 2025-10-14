@@ -7,10 +7,18 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Create database engine
+# Create database engine with proper encoding settings
 # Use SQLite for testing when DATABASE_URL is not set
 if settings.DATABASE_URL:
-    engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+    engine = create_engine(
+        settings.DATABASE_URL, 
+        pool_pre_ping=True,
+        pool_recycle=300,
+        connect_args={
+            "options": "-c timezone=utc",
+            "client_encoding": "utf8"
+        }
+    )
 else:
     engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
 

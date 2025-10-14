@@ -39,6 +39,13 @@ class Settings(BaseSettings):
 
     # E-commerce API keys
     ECOMMERCE_API_KEY: str = ""
+    
+    # Enhanced E-commerce APIs
+    AMAZON_API_KEY: str = ""
+    SHOPIFY_API_KEY: str = ""
+    SHOPIFY_STORE_URL: str = ""
+    EBAY_API_KEY: str = ""
+    ETSY_API_KEY: str = ""
 
     # AI Service API keys
     OPENAI_API_KEY: str = ""
@@ -60,8 +67,12 @@ class Settings(BaseSettings):
             # Extract the host from SUPABASE_URL
             # Supabase URL format: https://<project-id>.supabase.co
             # PostgreSQL connection format: postgresql://postgres:[YOUR-PASSWORD]@db.<project-id>.supabase.co:5432/postgres
-            host = self.SUPABASE_URL.replace("https://", "")
-            return f"postgresql://postgres:{self.SUPABASE_KEY}@db.{host}:5432/postgres"
+            try:
+                host = self.SUPABASE_URL.replace("https://", "")
+                # Use the service key as password for direct database connection
+                return f"postgresql://postgres:{self.SUPABASE_KEY}@db.{host}:5432/postgres?sslmode=require"
+            except Exception:
+                return ""
         return ""
 
     class Config:

@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.api.routes import products, videos, social_media, monitoring
+from app.api.routes import products, videos, social_media, monitoring, analytics
 
 # Set up logging
 setup_logging()
@@ -32,6 +32,7 @@ app.include_router(products.router, prefix=settings.API_V1_STR + "/products", ta
 app.include_router(videos.router, prefix=settings.API_V1_STR + "/videos", tags=["videos"])
 app.include_router(social_media.router, prefix=settings.API_V1_STR + "/social-media", tags=["social-media"])
 app.include_router(monitoring.router, prefix=settings.API_V1_STR + "/monitoring", tags=["monitoring"])
+app.include_router(analytics.router, prefix=settings.API_V1_STR + "/analytics", tags=["analytics"])
 
 # Add middleware for monitoring
 @app.middleware("http")
