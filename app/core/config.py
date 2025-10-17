@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # Database settings (Supabase)
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
+    SUPABASE_DB_PASSWORD: str = ""
 
     # Redis settings for Celery
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -63,14 +64,16 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL(self) -> str:
         """Construct DATABASE_URL from Supabase credentials"""
-        if self.SUPABASE_URL and self.SUPABASE_KEY:
-            # Extract the host from SUPABASE_URL
+        if self.SUPABASE_URL and self.SUPABASE_DB_PASSWORD:
+            # Extract the project-id from SUPABASE_URL
             # Supabase URL format: https://<project-id>.supabase.co
-            # PostgreSQL connection format: postgresql://postgres:[YOUR-PASSWORD]@db.<project-id>.supabase.co:5432/postgres
+            # PostgreSQL connection format: postgresql://postgres:[PASSWORD]@db.<project-id>.supabase.co:5432/postgres
             try:
-                host = self.SUPABASE_URL.replace("https://", "")
-                # Use the service key as password for direct database connection
-                return f"postgresql://postgres:{self.SUPABASE_KEY}@db.{host}:5432/postgres?sslmode=require"
+                from urllib.parse import quote
+                host = self.SUPABASE_URL.replace("https://", "").replace(".supabase.co", "")
+                # URL encode password, keeping only safe characters
+                encoded_password = quote(self.SUPABASE_DB_PASSWORD, safe='')
+                return f"postgresql://postgres:{encoded_password}@db.{host}.supabase.co:5432/postgres?sslmode=require"
             except Exception:
                 return ""
         return ""
