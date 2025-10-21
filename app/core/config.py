@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     INSTAGRAM_CLIENT_SECRET: str = ""
     INSTAGRAM_PAGE_ID: str = ""
     YOUTUBE_API_KEY: str = ""
+    
+    # YouTube OAuth settings
+    YOUTUBE_CLIENT_ID: str = ""
+    YOUTUBE_CLIENT_SECRET: str = ""
+    YOUTUBE_CLIENT_SECRET_FILE: str = "google_client_secret.json"
 
     # E-commerce API keys
     ECOMMERCE_API_KEY: str = ""
@@ -69,11 +74,11 @@ class Settings(BaseSettings):
             # Supabase URL format: https://<project-id>.supabase.co
             # PostgreSQL connection format: postgresql://postgres:[PASSWORD]@db.<project-id>.supabase.co:5432/postgres
             try:
-                from urllib.parse import quote
+                from urllib.parse import quote_plus
                 host = self.SUPABASE_URL.replace("https://", "").replace(".supabase.co", "")
-                # URL encode password, keeping only safe characters
-                encoded_password = quote(self.SUPABASE_DB_PASSWORD, safe='')
-                return f"postgresql://postgres:{encoded_password}@db.{host}.supabase.co:5432/postgres?sslmode=require"
+                # URL encode password using quote_plus for better compatibility
+                encoded_password = quote_plus(self.SUPABASE_DB_PASSWORD)
+                return f"postgresql://postgres:{encoded_password}@db.{host}.supabase.co:5432/postgres?client_encoding=utf8"
             except Exception:
                 return ""
         return ""

@@ -108,6 +108,15 @@ ENV/
 env.bak/
 venv.bak/
 
+# OAuth & API Credentials
+*_secret*.json
+google_client_secret.json
+*.pickle
+youtube_token.pickle
+*_token.pickle
+*.pem
+aws-factory-key.pem
+
 # Spyder project settings
 .spyderproject
 .spyproject

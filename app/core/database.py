@@ -14,7 +14,10 @@ if settings.DATABASE_URL:
         settings.DATABASE_URL, 
         pool_pre_ping=True,
         pool_recycle=300,
-        echo=False
+        echo=False,
+        connect_args={
+            "client_encoding": "utf8"
+        }
     )
 else:
     engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})

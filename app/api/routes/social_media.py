@@ -1,14 +1,16 @@
 """
 Social media API routes for the AI Content Factory application
 """
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.social_media import SocialMediaPost, SocialMediaPostCreate, SocialMediaPostUpdate
 from app.services.social_media_publisher import get_post_by_id, get_posts, create_post, update_post, delete_post, publish_to_multiple_platforms
+from app.services.youtube_oauth import youtube_oauth_service
 
 router = APIRouter()
 
@@ -90,3 +92,135 @@ async def publish_video_to_platforms(video_id: int, platforms: List[str] = ["tik
         "platforms_published": len(successful_publishes),
         "results": results
     }
+
+
+# YouTube OAuth Endpoints
+
+@router.get("/youtube/auth-status")
+async def youtube_auth_status():
+    """
+    Check YouTube authentication status
+    """
+    is_authenticated = youtube_oauth_service.is_authenticated()
+    
+    if is_authenticated:
+        # Get channel info
+        channel_info = youtube_oauth_service.get_channel_info()
+        return {
+            "authenticated": True,
+            "channel": channel_info
+        }
+    else:
+        return {
+            "authenticated": False,
+            "message": "Not authenticated with YouTube"
+        }
+
+
+@router.get("/youtube/auth")
+async def youtube_auth():
+    """
+    Initiate YouTube OAuth2 authentication flow
+    Returns the authorization URL for user to visit
+    """
+    try:
+        auth_url = youtube_oauth_service.get_auth_url()
+        return {
+            "auth_url": auth_url,
+            "message": "Please visit the auth_url to authenticate with YouTube"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate auth URL: {str(e)}"
+        )
+
+
+@router.get("/youtube/oauth2callback")
+async def youtube_oauth_callback(code: Optional[str] = None, error: Optional[str] = None):
+    """
+    OAuth2 callback endpoint for YouTube
+    """
+    if error:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Authentication failed: {error}"
+        )
+    
+    if not code:
+        raise HTTPException(
+            status_code=400,
+            detail="No authorization code provided"
+        )
+    
+    try:
+        success = youtube_oauth_service.authenticate_with_code(code)
+        
+        if success:
+            # Get channel info after successful authentication
+            channel_info = youtube_oauth_service.get_channel_info()
+            
+            return JSONResponse(
+                content={
+                    "success": True,
+                    "message": "YouTube authentication successful!",
+                    "channel": channel_info
+                }
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Authentication failed"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Authentication error: {str(e)}"
+        )
+
+
+@router.post("/youtube/upload")
+async def upload_to_youtube(
+    video_path: str,
+    title: str,
+    description: str,
+    category_id: str = "22",
+    privacy_status: str = "public",
+    tags: Optional[List[str]] = None
+):
+    """
+    Upload a video to YouTube
+    """
+    if not youtube_oauth_service.is_authenticated():
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated with YouTube. Please authenticate first using /youtube/auth"
+        )
+    
+    try:
+        result = youtube_oauth_service.upload_video(
+            video_path=video_path,
+            title=title,
+            description=description,
+            category_id=category_id,
+            privacy_status=privacy_status,
+            tags=tags or []
+        )
+        
+        if result.get('success'):
+            return {
+                "success": True,
+                "video_id": result['video_id'],
+                "video_url": result['video_url'],
+                "message": "Video uploaded successfully to YouTube"
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=result.get('error', 'Upload failed')
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Upload error: {str(e)}"
+        )

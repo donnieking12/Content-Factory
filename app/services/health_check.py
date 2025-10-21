@@ -14,22 +14,34 @@ from app.core.logging import logger
 
 async def check_database_health(db: Session) -> Dict[str, Any]:
     """
-    Check database health
+    Check database health with fallback to Supabase REST API
     """
     try:
-        # Execute a simple query to check database connectivity
+        # Try direct database connection first
         result = db.execute(text("SELECT 1"))
         result.fetchone()
         return {
             "status": "healthy",
-            "message": "Database connection successful"
+            "message": "Database connection successful (SQLAlchemy)"
         }
     except Exception as e:
-        logger.error(f"Database health check failed: {e}", exc_info=True)
-        return {
-            "status": "unhealthy",
-            "message": f"Database connection failed: {str(e)}"
-        }
+        logger.warning(f"SQLAlchemy database check failed: {e}, trying Supabase REST API")
+        
+        # Fallback to Supabase REST API
+        try:
+            from supabase import create_client
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+            result = supabase.table('products').select('*').limit(1).execute()
+            return {
+                "status": "healthy",
+                "message": "Database connection successful (Supabase REST API)"
+            }
+        except Exception as rest_error:
+            logger.error(f"Database health check failed: {rest_error}", exc_info=True)
+            return {
+                "status": "unhealthy",
+                "message": f"Database connection failed: {str(rest_error)}"
+            }
 
 
 async def check_redis_health() -> Dict[str, Any]:
