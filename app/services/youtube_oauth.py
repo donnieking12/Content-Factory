@@ -104,8 +104,7 @@ class YouTubeOAuthService:
         
         auth_url, _ = flow.authorization_url(
             access_type='offline',
-            include_granted_scopes='true',
-            prompt='consent'
+            include_granted_scopes=True
         )
         
         logger.info(f"Generated YouTube OAuth authorization URL with redirect: {redirect_uri}")
